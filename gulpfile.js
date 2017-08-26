@@ -16,11 +16,23 @@ var gulp           = require('gulp'),
 
 // Скрипты проекта
 
-gulp.task('js', function() {
+gulp.task('common-js', function() {
 	return gulp.src([
 		'app/js/common.js',
 		])
-	// .pipe(uglify())
+	.pipe(concat('common.min.js'))
+	.pipe(uglify())
+	.pipe(gulp.dest('app/js'));
+});
+
+gulp.task('js', ['common-js'], function() {
+	return gulp.src([
+		'app/libs/jquery/dist/jquery.min.js',
+		'app/libs/bootstrap/dist/js/bootstrap.min.js',
+		'app/js/common.min.js',
+		])
+	.pipe(concat('scripts.min.js'))
+	// .pipe(uglify()) // Минимизировать весь js (на выбор)
 	.pipe(gulp.dest('app/js'))
 	.pipe(browserSync.reload({stream: true}));
 });
@@ -36,7 +48,6 @@ gulp.task('browser-sync', function() {
 	});
 });
 
-// SASS 
 gulp.task('sass', function() {
 	return gulp.src('app/sass/**/*.sass')
 	.pipe(sass({outputStyle: 'expand'}).on("error", notify.onError()))
